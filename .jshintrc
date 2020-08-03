@@ -1,0 +1,4 @@
+// Especificación de versión del ECMASCRIPT a utilizar en el proyecto.
+{
+    "esversion": 9
+}
