@@ -1,5 +1,6 @@
 const express = require('express');
 const Categoria = require('../../models/categoria');
+const categoria = require('../../models/categoria');
 const app = express();
 
 app.get('/obtener', (req, res) => {
@@ -80,7 +81,8 @@ app.post('/registrar', (req, res) => {
 
     let categoria = new Categoria({
         strNombre: req.body.strNombre,
-        strDescripcion: req.body.strDescripcion
+        strDescripcion: req.body.strDescripcion,
+        blnActivo: req.body.blnActivo
     });
 
     new Categoria(categoria).save().then((resp) => {
@@ -99,7 +101,7 @@ app.post('/registrar', (req, res) => {
         res.status(500).json({
             ok: false,
             resp: 500,
-            msg: 'Error al registrar la categoria',
+            msg: 'Ya esta registrada la categoria',
             cont: {
                 err
             }
@@ -114,7 +116,8 @@ app.put('/actualizar/:id', (req, res) => {
     let categoria = new Categoria({
         _id: req.params.id,
         strNombre: req.body.strNombre,
-        strDescripcion: req.body.strDescripcion
+        strDescripcion: req.body.strDescripcion,
+        blnActivo: req.body.blnActivo
     });
 
     let err = categoria.validateSync();
@@ -168,24 +171,12 @@ app.put('/actualizar/:id', (req, res) => {
 });
 
 app.delete('/eliminar/:id', (req, res) => {
-
-    Categoria.findByIdAndRemove(req.params.id).then((resp) => {
-
-        if (!resp) {
-            res.status(404).json({
-                ok: false,
-                resp: 404,
-                msg: 'No existe la categoria',
-                cont: {
-                    err
-                }
-            });
-        }
-
-        res.status(200).json({
-            ok: true,
-            resp: 200,
-            msg: 'Se elimino la categoria',
+    let id = req.params.id;
+    Categoria.findByIdAndUpdate(id, { blnActivo: false }, { new: true, runValidators: true, context: 'query' }).then((resp) => {
+        return res.status(200).json({
+            ok: false,
+            status: 200,
+            msg: 'Se activo la categoria',
             cont: {
                 resp
             }
@@ -193,10 +184,36 @@ app.delete('/eliminar/:id', (req, res) => {
 
     }).catch((err) => {
 
-        res.status(500).json({
+        return res.status(400).json({
             ok: false,
-            resp: 500,
-            msg: 'Error al eliminar la categoria',
+            status: 400,
+            msg: 'Error al desactivar la categoria',
+            cont: {
+                err
+            }
+        });
+
+    });
+
+});
+app.delete('/activar/:id', (req, res) => {
+    let id = req.params.id;
+    Categoria.findByIdAndUpdate(id, { blnActivo: true }, { new: true, runValidators: true, context: 'query' }).then((resp) => {
+        return res.status(200).json({
+            ok: true,
+            status: 200,
+            msg: 'Se activo la categoria',
+            cont: {
+                resp
+            }
+        });
+
+    }).catch((err) => {
+
+        return res.status(400).json({
+            ok: false,
+            status: 400,
+            msg: 'Error al desactivar la categoria',
             cont: {
                 err
             }

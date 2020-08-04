@@ -18,6 +18,10 @@ const categoria = mongoose.Schema({
     strDescripcion: {
         type: String,
         required: [true, 'La descripcion es requerida']
+    },
+    blnActivo: {
+        type: Boolean,
+        default: true
     }
 }, schemaOptions);
 

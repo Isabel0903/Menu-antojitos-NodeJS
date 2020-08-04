@@ -1,8 +1,8 @@
 // Puerto
-process.env.PORT = process.env.PORT | 3000;
+process.env.PORT = process.env.PORT || 3000;
 
 // Entorno
-process.env.NODE_ENV = process.env.NODE_ENV | 'dev';
+process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
 
 // Conexión de BD
 if (process.env.NODE_ENV === 'env') {

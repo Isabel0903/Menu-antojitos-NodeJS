@@ -13,7 +13,7 @@ const platillo = mongoose.Schema({
     idCategoria: {
         type: mongoose.Types.ObjectId,
         ref: 'categoria',
-        required: [true, 'La categoria es requerida']
+
     },
     strNombre: {
         type: String,
@@ -30,11 +30,15 @@ const platillo = mongoose.Schema({
     },
     nmbPiezas: {
         type: Number,
-        required: [true, 'Las piezas son requeridas']
+        // required: [true, 'Las piezas son requeridas']
     },
     nmbPrecio: {
         type: Number,
-        required: [true, 'El precio es requerido']
+        // required: [true, 'El precio es requerido']
+    },
+    blnActivo: {
+        type: Boolean,
+        default: true
     }
 }, schemaOptions);
 

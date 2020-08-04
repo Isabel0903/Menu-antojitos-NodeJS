@@ -1,5 +1,6 @@
 const express = require('express');
 const Platillo = require('../../models/platillo');
+const platillo = require('../../models/platillo');
 const app = express();
 
 app.get('/obtenerPorCategoria/:idCat', (req, res) => {
@@ -41,7 +42,8 @@ app.get('/obtenerPorCategoria/:idCat', (req, res) => {
 
 app.get('/obtener/:id', (req, res) => {
 
-    Platillo.findOne({ idCategoria: req.params.idCat, _id: req.params.id }).then((resp) => {
+
+    Platillo.findOne({ _id: req.params.id }).then((resp) => {
 
         if (!resp) {
             return res.status(404).json({
@@ -76,7 +78,7 @@ app.get('/obtener/:id', (req, res) => {
 
 });
 
-app.post('/registrar', (req, res) => {
+app.post('/registrar/:idCategoria', (req, res) => {
 
     let platillo = new Platillo({
         idCategoria: req.body.idCategoria,
@@ -84,9 +86,10 @@ app.post('/registrar', (req, res) => {
         strDescripcion: req.body.strDescripcion,
         strIngredientes: req.body.strIngredientes,
         nmbPiezas: req.body.nmbPiezas,
-        nmbPrecio: req.body.nmbPrecio
+        nmbPrecio: req.body.nmbPrecio,
+        blnActivo: req.body.blnActivo
     });
-
+    let id = req.params.id;
     new Platillo(platillo).save().then((resp) => {
 
         return res.status(200).json({
@@ -99,6 +102,7 @@ app.post('/registrar', (req, res) => {
         });
 
     }).catch((err) => {
+        console.log('mmmmmm');
 
         return res.status(500).json({
             ok: false,
@@ -122,7 +126,8 @@ app.put('/actualizar/:id', (req, res) => {
         strDescripcion: req.body.strDescripcion,
         strIngredientes: req.body.strIngredientes,
         nmbPiezas: req.body.nmbPiezas,
-        nmbPrecio: req.body.nmbPrecio
+        nmbPrecio: req.body.nmbPrecio,
+        blnActivo: req.body.blnActivo
     });
 
     let err = platillo.validateSync();
@@ -176,24 +181,12 @@ app.put('/actualizar/:id', (req, res) => {
 });
 
 app.delete('/eliminar/:id', (req, res) => {
-
-    Platillo.findByIdAndRemove(req.params.id).then((resp) => {
-
-        if (!resp) {
-            return res.status(404).json({
-                ok: false,
-                resp: 404,
-                msg: 'No existe el platillo',
-                cont: {
-                    err
-                }
-            });
-        }
-
+    let id = req.params.id;
+    platillo.findByIdAndUpdate(id, { blnActivo: false }, { new: true, runValidators: true, context: 'query' }).then((resp) => {
         return res.status(200).json({
-            ok: true,
-            resp: 200,
-            msg: 'Se elimino el platillo',
+            ok: false,
+            status: 200,
+            msg: 'Se activo ',
             cont: {
                 resp
             }
@@ -201,10 +194,36 @@ app.delete('/eliminar/:id', (req, res) => {
 
     }).catch((err) => {
 
-        return res.status(500).json({
+        return res.status(400).json({
             ok: false,
-            resp: 500,
-            msg: 'Error al eliminar el platillo',
+            status: 400,
+            msg: 'Error al desactivar la categoria',
+            cont: {
+                err
+            }
+        });
+
+    });
+
+});
+app.delete('/activar/:id', (req, res) => {
+    let id = req.params.id;
+    platillo.findByIdAndUpdate(id, { blnActivo: true }, { new: true, runValidators: true, context: 'query' }).then((resp) => {
+        return res.status(200).json({
+            ok: true,
+            status: 200,
+            msg: 'Se activo la categoria',
+            cont: {
+                resp
+            }
+        });
+
+    }).catch((err) => {
+
+        return res.status(400).json({
+            ok: false,
+            status: 400,
+            msg: 'Error al desactivar la categoria',
             cont: {
                 err
             }
