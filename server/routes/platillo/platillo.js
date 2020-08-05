@@ -6,7 +6,7 @@ const app = express();
 app.get('/obtenerPorCategoria/:idCat', (req, res) => {
 
     Platillo.find({ idCategoria: req.params.idCat }).then((resp) => {
-
+        console.log(resp);
         if (resp.length <= 0) {
             return res.status(404).json({
                 ok: false,
@@ -79,9 +79,9 @@ app.get('/obtener/:id', (req, res) => {
 });
 
 app.post('/registrar/:idCategoria', (req, res) => {
-
+    let id = req.params.idCategoria;
     let platillo = new Platillo({
-        idCategoria: req.body.idCategoria,
+        idCategoria: id,
         strNombre: req.body.strNombre,
         strDescripcion: req.body.strDescripcion,
         strIngredientes: req.body.strIngredientes,
@@ -89,7 +89,7 @@ app.post('/registrar/:idCategoria', (req, res) => {
         nmbPrecio: req.body.nmbPrecio,
         blnActivo: req.body.blnActivo
     });
-    let id = req.params.id;
+
     new Platillo(platillo).save().then((resp) => {
 
         return res.status(200).json({
